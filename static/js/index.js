@@ -4,7 +4,7 @@ const submitButton = $("#submitButton");
 const nextButton = $("#nextButton");
 const finishButton = $("#finishButton");
 let audioPlayer = $("#audioPlayer");
-let recorder;
+let recorder, audioURL;
 function toggleButtons(record, stop, submit, next, finish) {
   // send true to the respecting parameter name to turn on the button
   //toggling all buttons based on the variable values
@@ -28,6 +28,13 @@ function stopRecording() {
 
 function playAudio(audioBlob) {
   audioPlayer.attr("src", URL.createObjectURL(audioBlob.data));
+  audioURL = window.URL.createObjectURL(audioBlob.data);
+  $("#downloadButton").attr("href", audioURL);
+  date = new Date();
+  $("#downloadButton").attr(
+    "download",
+    `${date.toLocaleDateString()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.wav`
+  );
   audioPlayer[0].play();
 }
 
@@ -53,4 +60,5 @@ if (navigator.mediaDevices) {
   recordButton.click(startRecording);
   stopButton.click(stopRecording);
   submitButton.click(submitAudio);
+  finishButton.click(() => (window.location.href = "/thanks"));
 }

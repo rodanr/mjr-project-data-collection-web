@@ -1,9 +1,13 @@
+//initializing
 const recordButton = $("#recordButton");
 const stopButton = $("#stopButton");
 const submitButton = $("#submitButton");
 const nextButton = $("#nextButton");
 const finishButton = $("#finishButton");
+const fileNameHolder = $("#fileNameHolder");
+const ws = new WebSocket("ws://localhost:3000/");
 let audioPlayer = $("#audioPlayer");
+let audioBlobGlobal;
 let recorder, audioURL;
 function toggleButtons(record, stop, submit, next, finish) {
   // send true to the respecting parameter name to turn on the button
@@ -14,34 +18,42 @@ function toggleButtons(record, stop, submit, next, finish) {
   nextButton.prop("disabled", !next);
   finishButton.prop("disabled", !finish);
 }
+function toggleFileNameHolder(show) {
+  if (show === true) {
+    fileNameHolder.css("display", "block");
+  } else {
+    fileNameHolder.css("display", "none");
+  }
+}
 function startRecording() {
-  //toggling unecessary buttons
+  //toggling unnecessary buttons
   toggleButtons(false, true, false, false, false);
+  //not showing filename
+  toggleFileNameHolder(false);
   //starting record
   recorder.start();
 }
 function stopRecording() {
   //toggling buttons
   toggleButtons(true, false, true, false, false);
+  toggleFileNameHolder(true); //showing filename
   recorder.stop();
 }
 
 function playAudio(audioBlob) {
-  audioPlayer.attr("src", URL.createObjectURL(audioBlob.data));
-  audioURL = window.URL.createObjectURL(audioBlob.data);
+  audioBlobGlobal = audioBlob;
+  audioPlayer.attr("src", URL.createObjectURL(audioBlobGlobal.data));
+  audioURL = window.URL.createObjectURL(audioBlobGlobal.data);
+  fileName = fileNameHolder.text();
   $("#downloadButton").attr("href", audioURL);
-  date = new Date();
-  $("#downloadButton").attr(
-    "download",
-    `${date.toLocaleDateString()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.wav`
-  );
+  $("#downloadButton").attr("download", `${fileName}`);
   audioPlayer[0].play();
 }
 
 function submitAudio() {
   //toggling buttons
   toggleButtons(true, false, false, true, true);
-  alert("Audio Submitted Successfully");
+  ws.send(audioBlobGlobal.data);
 }
 
 if (navigator.mediaDevices) {
@@ -61,4 +73,5 @@ if (navigator.mediaDevices) {
   stopButton.click(stopRecording);
   submitButton.click(submitAudio);
   finishButton.click(() => (window.location.href = "/thanks"));
+  nextButton.click(() => location.reload()); //refreshing the page to get new text to read and get new filename
 }

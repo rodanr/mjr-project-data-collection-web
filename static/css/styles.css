@@ -1,3 +1,6 @@
 audio {
   width: 250px;
 }
+#fileNameHolder {
+  display: none;
+}

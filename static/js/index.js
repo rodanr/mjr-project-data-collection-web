@@ -51,9 +51,9 @@ function playAudio(audioBlob) {
 }
 
 function submitAudio() {
-  //toggling buttons
-  toggleButtons(true, false, false, true, true);
   ws.send(audioBlobGlobal.data);
+  //toggling buttons
+  toggleButtons(false, false, false, true, true);
 }
 
 if (navigator.mediaDevices) {
@@ -74,4 +74,10 @@ if (navigator.mediaDevices) {
   submitButton.click(submitAudio);
   finishButton.click(() => (window.location.href = "/thanks"));
   nextButton.click(() => location.reload()); //refreshing the page to get new text to read and get new filename
+  //monitoring if the file is uploaded
+  ws.onmessage = function (event) {
+    if (event.data === "uploaded") {
+      alert("Successfully uploaded");
+    }
+  };
 }

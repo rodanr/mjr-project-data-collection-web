@@ -1,6 +1,7 @@
 //imports
 const express = require("express");
 const dotenv = require("dotenv");
+//for unique name generation
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs-extra");
 const WebSocket = require("ws");
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
   generateFileName();
   res.render("index", { filename: fileName });
 });
+//Receiving the audio data
 const wss = new WebSocket.Server({ port: process.env.port });
 wss.on("connection", (ws, req) => {
   ws.on("message", (message) => {
@@ -32,7 +34,10 @@ wss.on("connection", (ws, req) => {
         if (err) throw err;
         console.log("Upload success");
       })
-    );
+    ).then(() => {
+      //triggers onmessage in client side sending event.data as "uploaded" string
+      ws.send("uploaded");
+    });
   });
 });
 

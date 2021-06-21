@@ -1,6 +1,7 @@
 //imports
 const express = require("express");
 const dotenv = require("dotenv");
+const { MongoClient } = require("mongodb");
 //for unique name generation
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs-extra");
@@ -8,6 +9,10 @@ const WebSocket = require("ws");
 //initialization
 dotenv.config();
 const app = express();
+const client = new MongoClient(process.env.uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 const thanksRouter = require("./routes/thanks");
 const hostname = "127.1.0.0";
 
@@ -20,6 +25,19 @@ let fileName;
 function generateFileName() {
   fileName = uuidv4();
 }
+async function fetchSentence() {
+  try {
+    // Connect the client to the server
+    await client.connect();
+    // Establish and verify connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Connected successfully to server");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+fetchSentence().catch(console.dir);
 app.get("/", (req, res) => {
   generateFileName();
   res.render("index", { filename: fileName });

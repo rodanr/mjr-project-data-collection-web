@@ -1,7 +1,7 @@
 //imports
 const express = require("express");
 const dotenv = require("dotenv");
-const { MongoClient } = require("mongodb");
+const assert = require("assert");
 //for unique name generation
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs-extra");
@@ -9,39 +9,43 @@ const WebSocket = require("ws");
 //initialization
 dotenv.config();
 const app = express();
-const client = new MongoClient(process.env.uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
 const thanksRouter = require("./routes/thanks");
+const { log } = require("console");
 const hostname = "127.1.0.0";
+var sentenceToDisplay;
 
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/static"));
 app.use("/thanks", thanksRouter);
 app.use(express.urlencoded({ extended: false }));
 let fileName;
+function randomIntFromInterval(min, max) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function fetchSentence() {
+  let sentenceId = randomIntFromInterval(0, 10109);
+  let mySentence;
+  fs.readFile("data.json", (err, data) => {
+    if (err) throw err;
+    let jsonData = JSON.parse(data);
+    sentenceToDisplay = jsonData[sentenceId]["sentences"];
+  });
+}
+fetchSentence();
 //creating global fileName variable to use the value while saving to the cloud storage
 function generateFileName() {
   fileName = uuidv4();
 }
-async function fetchSentence() {
-  try {
-    // Connect the client to the server
-    await client.connect();
-    // Establish and verify connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Connected successfully to server");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-fetchSentence().catch(console.dir);
-app.get("/", (req, res) => {
+app.get("/", async function (req, res) {
   generateFileName();
-  res.render("index", { filename: fileName });
+  fetchSentence();
+  res.render("index", {
+    filename: fileName,
+    sentence: sentenceToDisplay,
+  });
 });
+
 //Receiving the audio data
 const wss = new WebSocket.Server({ port: process.env.port });
 wss.on("connection", (ws, req) => {

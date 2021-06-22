@@ -2,17 +2,20 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const assert = require("assert");
+const { MongoClient } = require("mongodb");
 //for unique name generation
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs-extra");
 const WebSocket = require("ws");
+
 //initialization
 dotenv.config();
 const app = express();
 const thanksRouter = require("./routes/thanks");
 const { log } = require("console");
 const hostname = "127.1.0.0";
-var sentenceToDisplay;
+var sentenceId;
+var jsonData;
 
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/static"));
@@ -23,26 +26,50 @@ function randomIntFromInterval(min, max) {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-function fetchSentence() {
-  let sentenceId = randomIntFromInterval(0, 10109);
-  let mySentence;
-  fs.readFile("data.json", (err, data) => {
-    if (err) throw err;
-    let jsonData = JSON.parse(data);
-    sentenceToDisplay = jsonData[sentenceId]["sentences"];
-  });
+async function fetchJSON() {
+  data = fs.readFileSync("data.json", "utf-8");
+  return JSON.parse(data);
 }
-fetchSentence();
+fetchJSON().then((data) => {
+  jsonData = data;
+});
+function getSentence() {
+  sentenceId = randomIntFromInterval(0, 10109);
+  return jsonData[sentenceId]["sentences"];
+}
+const uploadDocs = function (db, callback) {
+  // Get the documents collection
+  const collection = db.collection("data_collection");
+  // Find some documents
+  // Insert some documents
+  var object = { _id: sentenceId, sentenceId: sentenceId, fileName: fileName };
+  collection.insertOne(object, function (err, result) {
+    if (err) throw err;
+  });
+};
+async function uploadToCollection() {
+  MongoClient.connect(
+    process.env.uri,
+    { useUnifiedTopology: true },
+    function (err, client) {
+      assert.equal(null, err);
+      // console.log("Connected correctly to server");
+      const db = client.db(process.env.dbName);
+      uploadDocs(db, function () {
+        client.close();
+      });
+    }
+  );
+}
 //creating global fileName variable to use the value while saving to the cloud storage
 function generateFileName() {
   fileName = uuidv4();
 }
 app.get("/", async function (req, res) {
   generateFileName();
-  fetchSentence();
   res.render("index", {
     filename: fileName,
-    sentence: sentenceToDisplay,
+    sentence: getSentence(),
   });
 });
 
@@ -57,6 +84,7 @@ wss.on("connection", (ws, req) => {
         console.log("Upload success");
       })
     ).then(() => {
+      uploadToCollection();
       //triggers onmessage in client side sending event.data as "uploaded" string
       ws.send("uploaded");
     });

@@ -16,13 +16,15 @@ const welcomeRouter = require("./routes/welcome");
 const { log } = require("console");
 const hostname = "127.1.0.0";
 var sentenceId;
-var jsonData;
+var jsonData, gender;
+
 
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/static"));
 app.use("/thanks", thanksRouter);
 app.use("/", welcomeRouter);
 app.use(express.urlencoded({ extended: false }));
+
 let fileName;
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -68,13 +70,17 @@ async function uploadToCollection() {
 function generateFileName() {
   fileName = uuidv4();
 }
-app.get("/collect", async function (req, res) {
+
+app.post("/collect", async function (req, res) {
   generateFileName();
+  console.log(req.body)
   res.render("index", {
     filename: fileName,
     sentence: getSentence(),
   });
 });
+
+
 
 //Receiving the audio data
 const wss = new WebSocket.Server({ port: process.env.port });

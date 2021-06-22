@@ -12,6 +12,7 @@ const WebSocket = require("ws");
 dotenv.config();
 const app = express();
 const thanksRouter = require("./routes/thanks");
+const welcomeRouter = require("./routes/welcome");
 const { log } = require("console");
 const hostname = "127.1.0.0";
 var sentenceId;
@@ -20,6 +21,7 @@ var jsonData;
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/static"));
 app.use("/thanks", thanksRouter);
+app.use("/", welcomeRouter);
 app.use(express.urlencoded({ extended: false }));
 let fileName;
 function randomIntFromInterval(min, max) {
@@ -66,7 +68,7 @@ async function uploadToCollection() {
 function generateFileName() {
   fileName = uuidv4();
 }
-app.get("/", async function (req, res) {
+app.get("/collect", async function (req, res) {
   generateFileName();
   res.render("index", {
     filename: fileName,

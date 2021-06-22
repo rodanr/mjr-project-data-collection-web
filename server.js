@@ -27,9 +27,11 @@ function randomIntFromInterval(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 async function fetchJSON() {
+  //reading data from data.json
   data = fs.readFileSync("data.json", "utf-8");
   return JSON.parse(data);
 }
+//data is passed to jsonData variable after promise is resolved from fetchJSON
 fetchJSON().then((data) => {
   jsonData = data;
 });
@@ -40,7 +42,6 @@ function getSentence() {
 const uploadDocs = function (db, callback) {
   // Get the documents collection
   const collection = db.collection("data_collection");
-  // Find some documents
   // Insert some documents
   var object = { _id: sentenceId, sentenceId: sentenceId, fileName: fileName };
   collection.insertOne(object, function (err, result) {

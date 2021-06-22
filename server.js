@@ -8,6 +8,19 @@ const { v4: uuidv4 } = require("uuid");
 const fs = require("fs-extra");
 const WebSocket = require("ws");
 
+// for google drive uploads
+const { google } = require('googleapis');
+const path = require('path');
+const fsa = require('fs');
+
+const CLIENT_ID = '487485404362-8f3297hrttb74grvvb85a4qb2679hq4f.apps.googleusercontent.com';
+const CLIENT_SECRET = 'SnBz7MdBLC7bzuqsiMo2VI6g';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground/';
+
+const REFRESH_TOKEN = '1//049qC-mxHpZeECgYIARAAGAQSNwF-L9IruZRUgRqcmyzaKOiTQuvY4k7sWpRbeICDhKPVDnc3sQqQN9ecmOrVyA6q_3yxu0ISukI';
+
+
+
 //initialization
 dotenv.config();
 const app = express();
@@ -27,6 +40,50 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 let fileName;
+
+const oauth2Client = new google.auth.OAuth2(
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URI  
+);
+
+oauth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
+
+const drive = google.drive(
+  {
+      version: 'v3',
+      auth: oauth2Client
+  }
+)
+
+
+
+async function uploadFile(name){
+  const dirPath = path.join(__dirname,'uploads')
+  try{
+      const filePath = path.join(dirPath, name);
+      const response = await drive.files.create({
+          requestBody:{
+              name: name,
+              mimeType: 'audio/wav',
+              parents:['1SfEFYnSoarrw7zjgSFf9XSNrYrj17KSl']
+          },
+          media:{
+              mimeType:'audio/wav',
+              body: fsa.createReadStream(filePath)
+          }
+      });
+      console.log(response.data);
+  }
+  catch(error){
+      console.log(error.message);
+  }
+  
+  fs.emptyDir(dirPath, ()=>{
+    console.log("Dir is now empty");
+  });
+}
+
 function randomIntFromInterval(min, max) {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -94,6 +151,8 @@ wss.on("connection", (ws, req) => {
         console.log("Upload success");
       })
     ).then(() => {
+      
+      uploadFile(`${fileName}.wav`);
       uploadToCollection();
       //triggers onmessage in client side sending event.data as "uploaded" string
       ws.send("uploaded");

@@ -24,6 +24,7 @@ app.use(express.static(__dirname + "/static"));
 app.use("/thanks", thanksRouter);
 app.use("/", welcomeRouter);
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 let fileName;
 function randomIntFromInterval(min, max) {

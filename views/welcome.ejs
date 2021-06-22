@@ -18,13 +18,12 @@
       <h2>Please select your Gender</h2><br>
       <div>
       <form action="/collect" method="post">
-        <input type="radio" name="gender"><span class="p-3 fs-3">Male</span><br>
-        <input type="radio" name="gender"><span class="p-3 fs-3">Female</span><br>
-        <input type="radio" name="gender"><span class="p-3 fs-3">Other</span><br>
-        <input type="submit" value="Submit">
+        <input type="radio" name="gender" value="male"><span class="p-3 fs-4">Male</span><br>
+        <input type="radio" name="gender" value="female"><span class="p-3 fs-4">Female</span><br>
+        <input type="radio" name="gender" value="other"><span class="p-3 fs-4">Other</span><br>
+        <input type="submit" class = "btn btn-primary" value="Submit">
       </form>
       </div><br>
-      <a href="/collect" class = "btn btn-primary">Next</a>
     </div>
   </body>
 </html>

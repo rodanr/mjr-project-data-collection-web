@@ -48,7 +48,7 @@ const uploadDocs = function (db, callback) {
   // Get the documents collection
   const collection = db.collection("data_collection");
   // Insert some documents
-  var object = { _id: sentenceId, sentenceId: sentenceId, fileName: fileName };
+  var object = { sentenceId: sentenceId, fileName: fileName, gender: gender };
   collection.insertOne(object, function (err, result) {
     if (err) throw err;
   });
@@ -74,7 +74,7 @@ function generateFileName() {
 
 app.post("/collect", async function (req, res) {
   generateFileName();
-  console.log(req.body)
+  gender = req.body.gender;
   res.render("index", {
     filename: fileName,
     sentence: getSentence(),

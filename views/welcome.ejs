@@ -14,14 +14,33 @@
   </head>
   <body>
     <div class="jumbotron text-center m-5">
-      <h3>Welcome To Nepali Speech recognition Data Collection</h3><br>
-      <h2>Please select your Gender</h2><br>
+      <h2>Welcome To Nepali Speech recognition Data Collection</h2><br>
+      <p class='fs-5'>
+          This is a IOE, Tribhuvan University's final year project's data collection to create a Nepali
+          Speech Recognition model. Here after you select your gender, you'd be shown a text in devnagari
+          lipi and you can record your voice reading that text shown. To make sure it is correct, you can
+          replay the recording and re-record it as per requirement.
+      </p>
+      <p class="text-start">
+        
+        <b>Contact Info: mjrproject.sagarmatha@gmail.com</b>
+      </p>
+    </div>
+    <hr style="width: 90%; margin-left: 5%;">
+    <div class="container pl-2">
+      <h4>Please select your Gender</h4><br>
       <div>
       <form action="/collect" method="post">
-        <input type="radio" name="gender" value="male"><span class="p-3 fs-4">Male</span><br>
-        <input type="radio" name="gender" value="female"><span class="p-3 fs-4">Female</span><br>
-        <input type="radio" name="gender" value="other"><span class="p-3 fs-4">Other</span><br>
-        <input type="submit" class = "btn btn-primary" value="Submit">
+        <label>
+          <input type="radio" name="gender" value="male" required><span class="p-3 fs-4">Male</span>
+        </label><br>
+        <label>
+          <input type="radio" name="gender" value="female"><span class="p-3 fs-4">Female</span>
+        </label><br>
+        <label>
+          <input type="radio" name="gender" value="other"><span class="p-3 fs-4">Other</span>
+        </label><br>
+        <input type="submit" class = "btn btn-primary mt-3" value="Next">
       </form>
       </div><br>
     </div>

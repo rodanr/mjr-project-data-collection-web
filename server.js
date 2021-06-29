@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs-extra');
 const WebSocket = require('ws');
 const os = require('os');
+const crypto = require('crypto');
 
 // for google drive uploads
 const { google } = require('googleapis');
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
   } else {
     mac = Date.now() + Math.random();
   }
+  mac = crypto.createHash('sha256').update(mac).digest('base64');
   next();
 });
 app.use(express.static(__dirname + '/static'));

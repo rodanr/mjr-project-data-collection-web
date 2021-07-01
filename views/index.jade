@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  div.container.mx-auto.ps-3.pb-3
+    h4.mb-4.mt-4 #{title}
+    p.blockquote-footer.mb-4 Sagarmatha Engineering College
+    h2.mb-4 #{sentence}
+    #recordControls
+      button.btn.btn-success.me-2#recordButton Record
+      button(disabled).btn.btn-danger.me-3#stopButton Stop
+    audio(controls).mt-3.mb-3#audioPlayer
+    br
+    #pageControls
+      button(disabled).btn.btn-info#submitButton Submit
+      button(disabled).btn.btn-warning.float-end.me-5.p-2#finishButton Finish
+  script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js")
+  script.
+    gender='#{gender}';
+    sentence_id='#{id}';
+  script(src="/javascripts/index.js") 

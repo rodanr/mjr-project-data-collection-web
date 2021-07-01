@@ -1,0 +1,30 @@
+extends layout
+
+block content
+    .jumbotron.text-center.ml-5.mt-3
+        h2 Welcome To Nepali Speech recognition Data Collection
+        br
+        p.fs-5 This is a IOE, Tribhuvan University's final year project's data collection to create a Nepali Speech Recognition model. Here after you select your gender, you'd be shown a text in devnagari lipi and you can record your voice reading that text shown. To make sure it is correct, you can replay the recording and re-record it as per requirement.
+        p.text-start
+            b Contact Info: mjrproject.sagarmatha@gmail.com
+    hr#hr-line-style
+    .container.pl-2 
+        .row 
+            .col-4 
+                h4 Please select your gender
+                br
+                form(action="/mainPage/collect" method="post")
+                    input(type="radio", name="gender", value="male", id="male", required)
+                    label(for="male").p-3.fs-4 Male
+                    br
+                    input(type="radio", name="gender", value="female", id="female")
+                    label(for="female").p-3.fs-4 Female
+                    br
+                    input(type="radio", name="gender", value="others", id="others")
+                    label(for="others").p-3.fs-4 Others
+                    br
+                    input(type="submit", value="Next").btn.btn-primary.mt-3
+            .col
+                h4 Steps to start recording audio in this site
+                iframe(src="https://www.youtube.com/embed/XldywwZ8Ss4", width="100%", height="100%", frameborder="0", allowfullscreen)
+

@@ -5,11 +5,12 @@ const submitButton = $('#submitButton');
 const nextButton = $('#nextButton');
 const finishButton = $('#finishButton');
 const fileNameHolder = $('#fileNameHolder');
-const ws = new WebSocket('ws://localhost:3000/');
+const ws = new WebSocket('ws://' + document.domain + ':3000');
 let audioPlayer = $('#audioPlayer');
 let audioBlobGlobal;
 let recorder, audioURL;
 var finish = false;
+console.log(sentence_id);
 function toggleButtons(record, stop, submit, next, finish) {
   // send true to the respecting parameter name to turn on the button
   //toggling all buttons based on the variable values
@@ -44,15 +45,19 @@ function stopRecording() {
 function playAudio(audioBlob) {
   audioBlobGlobal = audioBlob;
   audioPlayer.attr('src', URL.createObjectURL(audioBlobGlobal.data));
-  audioURL = window.URL.createObjectURL(audioBlobGlobal.data);
   fileName = fileNameHolder.text();
-  $('#downloadButton').attr('href', audioURL);
-  $('#downloadButton').attr('download', `${fileName}`);
   // audioPlayer[0].play(); //Auto play after recording
 }
 
 function submitAudio() {
+  ws.send(
+    JSON.stringify({
+      gender: gender,
+      sentence_id: sentence_id,
+    })
+  );
   ws.send(audioBlobGlobal.data);
+
   //toggling buttons
   toggleButtons(false, false, false, true, true);
 }
